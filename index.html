@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -69,8 +68,8 @@
     <div class="encabezado">
       <img src="https://pagalo.pe/imagenes/new/logo-pagalo.svg" alt="Logo Pagalo.pe">
       <div>
-        <div><strong>NRO. BOLETA:</strong> <span id="codigo"></span></div>
-        <div><strong>FECHA DE OPERACIÓN:</strong> <span id="fecha"></span></div>
+        <div><strong>NRO. BOLETA:</strong> <span id="codigo">---</span></div>
+        <div><strong>FECHA DE OPERACIÓN:</strong> <span id="fecha">--/--/----</span></div>
       </div>
     </div>
 
@@ -103,22 +102,21 @@
   <button class="boton" onclick="generarPDF()">Descargar Boleta PDF</button>
 
   <script>
-    const params = new URLSearchParams(window.location.search);
-    document.getElementById("nombre").textContent = params.get("nombre") || "";
-    document.getElementById("documento").textContent = params.get("documento") || "";
-    document.getElementById("celular").textContent = params.get("celular") || "";
-    document.getElementById("pais").textContent = params.get("pais") || "";
-    document.getElementById("monto").textContent = params.get("monto") || "0.00";
-    document.getElementById("montoTotal").textContent = params.get("monto") || "0.00";
+    // Recibir datos desde Wix por postMessage
+    window.addEventListener("message", (event) => {
+      const data = event.data;
 
-    const fecha = new Date();
-    const fechaFormateada = fecha.toLocaleDateString("es-PE", {
-      day: "2-digit", month: "2-digit", year: "numeric"
+      if (data && typeof data === "object") {
+        document.getElementById("nombre").textContent = data.nombre || "";
+        document.getElementById("documento").textContent = data.documento || "";
+        document.getElementById("celular").textContent = data.celular || "";
+        document.getElementById("pais").textContent = data.pais || "";
+        document.getElementById("monto").textContent = data.monto || "0.00";
+        document.getElementById("montoTotal").textContent = data.monto || "0.00";
+        document.getElementById("fecha").textContent = data.fecha || "--/--/----";
+        document.getElementById("codigo").textContent = data.codigo || "--------";
+      }
     });
-    document.getElementById("fecha").textContent = fechaFormateada;
-
-    const codigoUnico = Math.random().toString(36).substr(2, 8).toUpperCase();
-    document.getElementById("codigo").textContent = codigoUnico;
 
     function generarPDF() {
       const elemento = document.getElementById("boleta");
