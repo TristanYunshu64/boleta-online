@@ -100,30 +100,52 @@
   </div>
 
   <button class="boton" onclick="generarPDF()">Descargar Boleta PDF</button>
+  
+ <script>
+  const params = new URLSearchParams(window.location.search);
 
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    document.getElementById("nombre").textContent = params.get("nombre") || "";
-    document.getElementById("documento").textContent = params.get("documento") || "";
-    document.getElementById("celular").textContent = params.get("celular") || "";
-    document.getElementById("pais").textContent = params.get("pais") || "";
-    document.getElementById("monto").textContent = params.get("monto") || "0.00";
-    document.getElementById("montoTotal").textContent = params.get("monto") || "0.00";
+  // Extraer los valores
+  const nombre = params.get("nombre") || "";
+  const documento = params.get("documento") || "";
+  const celular = params.get("celular") || "";
+  const pais = params.get("pais") || "";
+  const monto = params.get("monto") || "0.00";
 
-    const fecha = new Date();
-    const fechaFormateada = fecha.toLocaleDateString("es-PE", {
-      day: "2-digit", month: "2-digit", year: "numeric"
-    });
-    document.getElementById("fecha").textContent = fechaFormateada;
+  // Insertar en la boleta
+  document.getElementById("nombre").textContent = nombre;
+  document.getElementById("documento").textContent = documento;
+  document.getElementById("celular").textContent = celular;
+  document.getElementById("pais").textContent = pais;
+  document.getElementById("monto").textContent = monto;
+  document.getElementById("montoTotal").textContent = monto;
 
-    const codigoUnico = Math.random().toString(36).substr(2, 8).toUpperCase();
-    document.getElementById("codigo").textContent = codigoUnico;
+  // Fecha de operación
+  const fecha = new Date();
+  const fechaFormateada = fecha.toLocaleDateString("es-PE", {
+    day: "2-digit", month: "2-digit", year: "numeric"
+  });
+  document.getElementById("fecha").textContent = fechaFormateada;
 
-    function generarPDF() {
-      const elemento = document.getElementById("boleta");
-      html2pdf().from(elemento).save("Boleta_Entrada.pdf");
-    }
-  </script>
-</body>
-</html>
+  // Generar código aleatorio de boleta
+  const nroBoleta = Math.random().toString(36).substr(2, 8).toUpperCase();
+  document.getElementById("codigo").textContent = nroBoleta;
+
+  // ✅ ENVIAR DATOS A GOOGLE SHEETS
+  fetch("https://script.google.com/macros/s/AKfycbXXXXXXXXXXXXXX/exec?" + new URLSearchParams({
+    nombre,
+    documento,
+    celular,
+    pais,
+    monto,
+    fecha: fechaFormateada,
+    nroBoleta
+  }));
+
+  // Descargar PDF
+  function generarPDF() {
+    const elemento = document.getElementById("boleta");
+    html2pdf().from(elemento).save("Boleta_Entrada.pdf");
+  }
+</script>
+
 
