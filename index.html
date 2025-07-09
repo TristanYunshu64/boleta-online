@@ -131,7 +131,7 @@
   document.getElementById("codigo").textContent = nroBoleta;
 
   // ✅ ENVIAR DATOS A GOOGLE SHEETS
-  fetch("https://script.google.com/macros/s/AKfycbXXXXXXXXXXXXXX/exec?" + new URLSearchParams({
+  fetch("https://script.google.com/macros/s/AKfycby-2j9j07D03xIZi-tRVlBYQQkJCHorKzpy71W32gA9pwYBwvpT1bto5o3MxQrbgCiz/exec?" + new URLSearchParams({
     nombre,
     documento,
     celular,
@@ -147,5 +147,5 @@
     html2pdf().from(elemento).save("Boleta_Entrada.pdf");
   }
 </script>
-
-
+</body>
+</html>
