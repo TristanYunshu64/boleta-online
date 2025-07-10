@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Boleta de Entrada</title>
+  <title>Boleta con Código</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     body {
@@ -51,16 +51,6 @@
       font-weight: bold;
       margin-top: 20px;
     }
-    .boton {
-      display: block;
-      margin: 30px auto;
-      padding: 10px 25px;
-      font-size: 16px;
-      background-color: #0078d7;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
   </style>
 </head>
 <body>
@@ -68,7 +58,7 @@
     <div class="encabezado">
       <img src="https://pagalo.pe/imagenes/new/logo-pagalo.svg" alt="Logo Pagalo.pe">
       <div>
-        <div><strong>NRO. BOLETA:</strong> <span id="codigo"></span></div>
+        <div><strong>NRO. BOLETA:</strong> <span id="codigo">Cargando...</span></div>
         <div><strong>FECHA DE OPERACIÓN:</strong> <span id="fecha"></span></div>
       </div>
     </div>
@@ -99,53 +89,53 @@
     </div>
   </div>
 
-  <button class="boton" onclick="generarPDF()">Descargar Boleta PDF</button>
-  
- <script>
-  const params = new URLSearchParams(window.location.search);
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const nombre = params.get("nombre");
+    const documento = params.get("documento");
+    const celular = params.get("celular");
+    const pais = params.get("pais");
+    const distrito = params.get("distrito");
+    const monto = params.get("monto");
 
-  // Extraer los valores
-  const nombre = params.get("nombre") || "";
-  const documento = params.get("documento") || "";
-  const celular = params.get("celular") || "";
-  const pais = params.get("pais") || "";
-  const monto = params.get("monto") || "0.00";
+    document.getElementById("nombre").textContent = nombre;
+    document.getElementById("documento").textContent = documento;
+    document.getElementById("celular").textContent = celular;
+    document.getElementById("pais").textContent = pais + (distrito ? " - " + distrito : "");
+    document.getElementById("monto").textContent = monto;
+    document.getElementById("montoTotal").textContent = monto;
 
-  // Insertar en la boleta
-  document.getElementById("nombre").textContent = nombre;
-  document.getElementById("documento").textContent = documento;
-  document.getElementById("celular").textContent = celular;
-  document.getElementById("pais").textContent = pais;
-  document.getElementById("monto").textContent = monto;
-  document.getElementById("montoTotal").textContent = monto;
+    const fecha = new Date();
+    const fechaFormateada = fecha.toLocaleDateString("es-PE", { day: "2-digit", month: "2-digit", year: "numeric" });
+    document.getElementById("fecha").textContent = fechaFormateada;
 
-  // Fecha de operación
-  const fecha = new Date();
-  const fechaFormateada = fecha.toLocaleDateString("es-PE", {
-    day: "2-digit", month: "2-digit", year: "numeric"
-  });
-  document.getElementById("fecha").textContent = fechaFormateada;
+    // 🔁 Contactar al script para obtener o generar el NRO. BOLETA
+    fetch("https://script.google.com/macros/s/PASTE_AQUI_TU_URL_DEL_SCRIPT/exec", {
+      method: "POST",
+      body: JSON.stringify({ nombre, documento, celular, pais, distrito, monto }),
+      headers: { "Content-Type": "application/json" }
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.nroBoleta) {
+        document.getElementById("codigo").textContent = data.nroBoleta;
 
-  // Generar código aleatorio de boleta
-  const nroBoleta = Math.random().toString(36).substr(2, 8).toUpperCase();
-  document.getElementById("codigo").textContent = nroBoleta;
-
-  // ✅ ENVIAR DATOS A GOOGLE SHEETS
-  fetch("https://script.google.com/macros/s/AKfycby-2j9j07D03xIZi-tRVlBYQQkJCHorKzpy71W32gA9pwYBwvpT1bto5o3MxQrbgCiz/exec?" + new URLSearchParams({
-    nombre,
-    documento,
-    celular,
-    pais,
-    monto,
-    fecha: fechaFormateada,
-    nroBoleta
-  }));
-
-  // Descargar PDF
-  function generarPDF() {
-    const elemento = document.getElementById("boleta");
-    html2pdf().from(elemento).save("Boleta_Entrada.pdf");
-  }
-</script>
+        // Esperar un poquito antes de generar el PDF
+        setTimeout(() => {
+          const element = document.getElementById("boleta");
+          html2pdf().set({
+            margin: 0,
+            filename: `boleta-${data.nroBoleta}.pdf`,
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+          }).from(element).save();
+        }, 1000);
+      } else {
+        document.getElementById("codigo").textContent = "ERROR";
+        alert("Hubo un problema al generar tu boleta.");
+      }
+    });
+  </script>
 </body>
 </html>
+
