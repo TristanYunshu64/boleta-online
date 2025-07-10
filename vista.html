@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Vista Boleta</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f7f7f7; }
+    .boleta { width: 750px; background: #fff; border: 2px solid #000; padding: 20px; margin: 30px auto; }
+    .encabezado { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid black; padding-bottom: 10px; }
+    .encabezado img { height: 50px; }
+    .titulo { text-align: center; margin: 20px 0; font-size: 22px; font-weight: bold; border: 2px solid black; padding: 10px; background-color: #eaeaea; }
+    .cuadro { border: 1px solid #000; padding: 10px; margin-bottom: 15px; }
+    .campo { font-weight: bold; }
+    .importe-total { border: 2px solid #000; text-align: right; font-size: 18px; padding: 10px; font-weight: bold; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <div class="boleta" id="boleta">
+    <div class="encabezado">
+      <img src="https://pagalo.pe/imagenes/new/logo-pagalo.svg" alt="Logo">
+      <div>
+        <div><strong>NRO. BOLETA:</strong> <span>SIN CÓDIGO</span></div>
+        <div><strong>FECHA DE OPERACIÓN:</strong> <span id="fecha"></span></div>
+      </div>
+    </div>
+
+    <div class="titulo">BOLETA PARA ENTRADA A EVENTO</div>
+
+    <div class="cuadro">
+      <div class="campo">DATOS DE LA OPERACIÓN</div>
+      <div><strong>Entidad:</strong> EVENTO ACADÉMICO</div>
+      <div><strong>Concepto:</strong> Ingreso a charla profesional</div>
+    </div>
+
+    <div class="cuadro">
+      <div class="campo">DATOS DEL CONTRIBUYENTE</div>
+      <div><strong>Nombre completo:</strong> <span id="nombre"></span></div>
+      <div><strong>DNI o Documento:</strong> <span id="documento"></span></div>
+      <div><strong>Celular:</strong> <span id="celular"></span></div>
+      <div><strong>País y Provincia:</strong> <span id="pais"></span></div>
+    </div>
+
+    <div class="cuadro">
+      <div class="campo">OTROS DATOS</div>
+      <div><strong>Monto:</strong> S/ <span id="monto"></span></div>
+    </div>
+
+    <div class="importe-total">
+      IMPORTE TOTAL: S/ <span id="montoTotal"></span>
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    document.getElementById("nombre").textContent = params.get("nombre") || "";
+    document.getElementById("documento").textContent = params.get("documento") || "";
+    document.getElementById("celular").textContent = params.get("celular") || "";
+    document.getElementById("pais").textContent = (params.get("pais") || "") + " - " + (params.get("distrito") || "");
+    document.getElementById("monto").textContent = params.get("monto") || "0.00";
+    document.getElementById("montoTotal").textContent = params.get("monto") || "0.00";
+
+    const fecha = new Date().toLocaleDateString("es-PE", { day: "2-digit", month: "2-digit", year: "numeric" });
+    document.getElementById("fecha").textContent = fecha;
+  </script>
+</body>
+</html>
